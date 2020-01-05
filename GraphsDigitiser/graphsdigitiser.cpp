@@ -8,6 +8,8 @@ graphsdigitiser::graphsdigitiser(QWidget *parent) :
     ui->setupUi(this);
 
     ui->graphicsView->setScene(scene);
+
+    setCentralWidget(ui->graphicsView);
 }
 
 graphsdigitiser::~graphsdigitiser()
@@ -32,6 +34,9 @@ void graphsdigitiser::mousePressEvent(QMouseEvent *event)
     if(isDigitising)
     {
         PointsVector.push_back(event->pos());
+        QVector<QPointF> a;
+        a = CalculateResult(PointsVector, type_of_x, type_of_y);
+        qDebug()<<"x: "<<a[a.size()-1].x()<<"y: "<<a[a.size()-1].y();
     }
 }
 
@@ -71,12 +76,38 @@ double graphsdigitiser::CalculateDistance(QVector<QPointF> &clickedPoints)
 
 QVector<QPointF> graphsdigitiser::CalculateResult(QVector<QPointF> &chosenPoints, int typeOfX, int typeOfY)
 {
-    if(typeOfX == 1||typeOfY == 1)
+    QVector<QPointF> DigitisedPointsVector; //Vector for saving the points that have been digitised
+    if(typeOfX == 1 && typeOfY == 1)
     {
         for(int i = 0;i < chosenPoints.size();i++)
         {
-
+            DigitisedPointsVector.push_back(QPointF((PointsVector[i].x()-CalibrationVectorX[0].x())/Calibration_factorX + XAxis_min,(CalibrationVectorY[0].y()-PointsVector[i].y())/Calibration_factorY + YAxis_min));
         }
+        return DigitisedPointsVector;
+    }
+    if(typeOfX == 1 && typeOfY == 2)
+    {
+        for(int i = 0;i < chosenPoints.size();i++)
+        {
+            DigitisedPointsVector.push_back(QPointF((PointsVector[i].x()-CalibrationVectorX[0].x())/Calibration_factorX + XAxis_min,qPow(10,(CalibrationVectorY[0].y()-PointsVector[i].y())/Calibration_factorY + YAxis_min)));
+        }
+        return DigitisedPointsVector;
+    }
+    if(typeOfX == 2 && typeOfY == 1)
+    {
+        for(int i = 0;i < chosenPoints.size();i++)
+        {
+            DigitisedPointsVector.push_back(QPointF(qPow(10,(PointsVector[i].x()-CalibrationVectorX[0].x())/Calibration_factorX + XAxis_min),(CalibrationVectorY[0].y()-PointsVector[i].y())/Calibration_factorY + YAxis_min));
+        }
+        return DigitisedPointsVector;
+    }
+    if(typeOfX == 2 && typeOfY == 2)
+    {
+        for(int i = 0;i < chosenPoints.size();i++)
+        {
+            DigitisedPointsVector.push_back(QPointF(qPow(10,(PointsVector[i].x()-CalibrationVectorX[0].x())/Calibration_factorX + XAxis_min),qPow(10,(CalibrationVectorY[0].y()-PointsVector[i].y())/Calibration_factorY + YAxis_min)));
+        }
+        return DigitisedPointsVector;
     }
 }
 
@@ -90,15 +121,17 @@ void graphsdigitiser::on_actionOpen_from_a_graph_triggered()
 }
 
 
-void graphsdigitiser::on_actionCalibrate_triggered()
+void graphsdigitiser::on_actionCalibrate_triggered() // Called whenever the user clicks on "Calibrate"
 {
-    isCalibratingX = true;
+    isCalibratingX = true; // Change the status of the flag to active the calibrate mode
     CalibrationVectorX.clear();
+    CalibrationVectorY.clear(); // Clear two calibration vectors for re-calibrating
 }
 
 void graphsdigitiser::on_actionManual_Mode_triggered() // Called whenever the user clicks on "Manual Mode"
 {
     isDigitising = true;
+    PointsVector.clear();
 }
 
 void graphsdigitiser::on_actionLinear_Linear_triggered() // Called whenever the user clicks on "Linear-Linear"

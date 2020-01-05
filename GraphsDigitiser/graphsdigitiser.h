@@ -58,7 +58,6 @@ private:
     bool isCalibrationLinear = false; // flag to indicate whether the app is calibrating linear axis or not
 
     QVector<QPointF> PointsVector; // Vector for saving the points need to be digitised
-    QVector<QPointF> DigitisedPointsVector; //Vector for saving the points that have been digitised
     bool isDigitising = false; // flag to indicate whether the app is in digitising mode or not
     
     double XAxis_min = 0; // Varaible to save the physical value of the minimum of the X axis
@@ -68,8 +67,8 @@ private:
     double Calibration_factorX = 0; // Varaible to save the calibration factor of X-axis (The unit depends on the graph)
     double Calibration_factorY = 0; // Varaible to save the calibration factor of Y-axis (The unit depends on the graph)
 
-    int type_of_x = 0;
-    int type_of_y = 0;
+    int type_of_x = 1;
+    int type_of_y = 1;
 };
 
 #endif // GRAPHSDIGITISER_H
